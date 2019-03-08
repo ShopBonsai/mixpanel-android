@@ -393,12 +393,12 @@ public class MixpanelFCMMessagingService extends FirebaseMessagingService {
             notificationTitle = "A message for you";
         }
 
-        final Intent notificationIntent = buildNotificationIntent(context, uriString, campaignId, messageId, extraLogData);
+        final Intent notificationIntent = buildNotificationIntent(context, inboundIntent, uriString, campaignId, messageId, extraLogData);
 
         return new MixpanelFCMMessagingService.NotificationData(notificationIcon, largeNotificationIcon, whiteNotificationIcon, notificationTitle, message, notificationIntent, color);
     }
 
-    private Intent buildNotificationIntent(Context context, String uriString, String campaignId, String messageId, String extraLogData) {
+    private Intent buildNotificationIntent(Context context, Intent inboundIntent, String uriString, String campaignId, String messageId, String extraLogData) {
         Uri uri = null;
         if (null != uriString) {
             uri = Uri.parse(uriString);
@@ -411,12 +411,17 @@ public class MixpanelFCMMessagingService extends FirebaseMessagingService {
             ret = new Intent(Intent.ACTION_VIEW, uri);
         }
 
+        if (inboundIntent != null) {
+            ret.putExtras(inboundIntent);
+        }
+
         if (campaignId != null) {
             ret.putExtra("mp_campaign_id", campaignId);
         }
 
         if (messageId != null) {
             ret.putExtra("mp_message_id", messageId);
+            ret.putExtra("notificationId", messageId);
         }
 
         if (extraLogData != null) {
